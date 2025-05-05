@@ -7,7 +7,6 @@ import { AuthGuard } from "@/providers/guard-provider";
 import AdminLayout from "@/components/layout/admin-layout";
 
 
-
 // Lazy load các trang
 const LoginPage = lazy(() => import("@/pages/login"));
 const DashboardPage = lazy(() => import("@/pages/dashboard"));
@@ -15,6 +14,7 @@ const ParentsCategoryPage = lazy(() => import("@/pages/parents-categories"));
 const ChildrensCategoryPage = lazy(() => import("@/pages/childrens-categories"));
 const ProductPage = lazy(() => import("@/pages/products"));
 const UserPage = lazy(() => import("@/pages/user"));
+const ProductDetailPage = lazy(() => import("@/pages/product-detail"));
 // Layout components
 const MainLayout = lazy(() => import("@/components/layout/main-layout"));
 const AuthLayout = lazy(() => import("@/components/layout/auth-layout"));
@@ -36,6 +36,7 @@ const AppRouter = () => {
                         <Route path="/childrens-category" element={<ChildrensCategoryPage />} />
                         <Route path="/products" element={<ProductPage />} />
                         <Route path="/user" element={<UserPage />} />
+                        <Route path="products/:id" element={<ProductDetailPage />} />
                     </Route>
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Route>

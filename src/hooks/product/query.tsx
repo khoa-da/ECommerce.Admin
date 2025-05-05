@@ -1,4 +1,4 @@
-import { getProducts } from "@/apis/product"
+import { getProductById, getProducts } from "@/apis/product"
 import { useQuery } from "@tanstack/react-query"
 
 export const useProducts = (page: number, size: number) => {
@@ -8,3 +8,10 @@ export const useProducts = (page: number, size: number) => {
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }
+export const useProductDetail = (id: string) => {
+    return useQuery({
+        queryKey: ["product", id],
+        queryFn: () => getProductById(id),
+        enabled: !!id,
+    });
+};

@@ -26,6 +26,7 @@ import {
 
 import { useProducts } from "@/hooks/product/query";
 import { productColumns } from "@/components/features/products/columns"; // file bạn vừa tạo
+import { DialogCreateProduct } from "./dialog-create-product";
 
 export function ProductTable() {
     const { data, isLoading, error } = useProducts(1, 10); // lấy dữ liệu sản phẩm từ API
@@ -68,6 +69,7 @@ export function ProductTable() {
                     }
                     className="max-w-sm"
                 />
+                <DialogCreateProduct />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">

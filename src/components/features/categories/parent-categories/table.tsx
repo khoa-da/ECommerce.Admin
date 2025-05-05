@@ -32,6 +32,7 @@ import {
 
 import { useCategoriesParents } from "@/hooks/category/query";
 import { columns } from "@/components/features/categories/_components/columns";
+import { DialogCreateParentCategory } from "./dialog-create-parent-category";
 
 export function ParentsCategoryTable() {
     const { data, isLoading, error } = useCategoriesParents();
@@ -65,7 +66,7 @@ export function ParentsCategoryTable() {
 
     return (
         <div className="w-full">
-            <div className="flex items-center py-4">
+            <div className="flex justify-between items-center py-4">
                 <Input
                     placeholder="Filter categories..."
                     value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -74,27 +75,31 @@ export function ParentsCategoryTable() {
                     }
                     className="max-w-sm"
                 />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            Columns <ChevronDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table.getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => (
-                                <DropdownMenuCheckboxItem
-                                    key={column.id}
-                                    className="capitalize"
-                                    checked={column.getIsVisible()}
-                                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                >
-                                    {column.id}
-                                </DropdownMenuCheckboxItem>
-                            ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-3" >
+                    <DialogCreateParentCategory />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="ml-auto">
+                                Columns <ChevronDown />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {table.getAllColumns()
+                                .filter((column) => column.getCanHide())
+                                .map((column) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={column.id}
+                                        className="capitalize"
+                                        checked={column.getIsVisible()}
+                                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                                    >
+                                        {column.id}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+
             </div>
             <div className="rounded-md border">
                 <Table>
@@ -159,6 +164,6 @@ export function ParentsCategoryTable() {
                     </Button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

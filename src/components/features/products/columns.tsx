@@ -11,6 +11,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { DialogProductDetail } from '@/components/features/products/dialog-product-detail';
 
 export const productColumns: ColumnDef<Product>[] = [
     {
@@ -96,7 +97,14 @@ export const productColumns: ColumnDef<Product>[] = [
                             Copy Product ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View Product</DropdownMenuItem>
+                        {/* <DropdownMenuItem asChild>
+                            <DialogProductDetail productId={product.id} />
+                        </DropdownMenuItem> */}
+                        <DropdownMenuItem
+                            onClick={() => window.location.href = `/products/${product.id}`}
+                        >
+                            View / Edit
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

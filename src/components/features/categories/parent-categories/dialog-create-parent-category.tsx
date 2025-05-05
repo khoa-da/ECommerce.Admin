@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -13,18 +15,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCategoryApi } from "@/hooks/category/mutation";
-import { useCategoriesParents } from "@/hooks/category/query";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export function DialogCreateChildrenCategory() {
+export function DialogCreateParentCategory() {
     const queryClient = useQueryClient();
     const { categoryMutation } = useCategoryApi();
 
-    const { data: parentCategories, isLoading: loadingParentCategories } = useCategoriesParents()
-
     const [open, setOpen] = useState(false); // 👈 thêm state control open/close
     const [name, setName] = useState("");
-    const [parentId, setParentId] = useState("");
     const [description, setDescription] = useState("");
 
     const handleSave = () => {
@@ -33,16 +30,15 @@ export function DialogCreateChildrenCategory() {
         categoryMutation.mutate(
             {
                 name,
-                parentId: parentId || undefined,
                 description,
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["children-categories"] });
+                    queryClient.invalidateQueries({ queryKey: ["parent-categories"] });
 
                     // Reset form
                     setName("");
-                    setParentId("");
+
                     setDescription("");
                     setOpen(false); // 👈 đóng dialog khi tạo thành công
                 },
@@ -78,23 +74,7 @@ export function DialogCreateChildrenCategory() {
                             placeholder="Enter category name"
                         />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="parentId" className="text-right">
-                            Parent Category
-                        </Label>
-                        <Select onValueChange={(value) => setParentId(value)} value={parentId}>
-                            <SelectTrigger className="col-span-3">
-                                <SelectValue placeholder={loadingParentCategories ? "Loading..." : "Select Parent Category"} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {parentCategories?.items.map((category) => (
-                                    <SelectItem key={category.id} value={category.id}>
-                                        {category.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="description" className="text-right">
                             Description

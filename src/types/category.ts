@@ -8,3 +8,8 @@ export interface Category {
     updatedDate: string;
     status: 'Active' | 'Inactive'; // hoặc string nếu còn nhiều trạng thái khác
 }
+export interface CreateCategoryPayload {
+    name: string;
+    parentId?: string; // optional nếu là parent category
+    description?: string;
+}

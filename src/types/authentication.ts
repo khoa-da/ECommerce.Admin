@@ -16,3 +16,22 @@ export interface AuthLoginRequest {
     usernameOrEmail: string
     password: string
 }
+
+export interface RefreshTokenRequest {
+    userId: string,
+    refreshToken: string
+}
+export interface RefreshTokenResponse {
+    accessToken: string;
+    accessTokenExpires: string;
+    refreshToken: string;
+    refreshTokenExpires: string;
+    userId: string;
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    status: string;
+    role: string;
+}
