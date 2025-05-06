@@ -1,18 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
-import { getCategoriesChildren, getCategoriesParents } from '@/apis/category';
+import { getCategoriesChildren, getCategoriesChildrenSelectAdmin, getCategoriesParents } from '@/apis/category';
 
-export const useCategoriesParents = () => {
+export const useCategoriesParents = (page: number, size: number) => {
     return useQuery({
-        queryKey: ['parent-categories'],
-        queryFn: getCategoriesParents,
+        queryKey: ['parent-categories', page, size],
+        queryFn: () => getCategoriesParents(page, size),
         staleTime: 5 * 60 * 1000, // cache 5 phút
     });
 };
 
-export const useCategoriesChildren = () => {
+export const useCategoriesChildren = (page: number, size: number) => {
     return useQuery({
-        queryKey: ['children-categories'],
-        queryFn: getCategoriesChildren,
+        queryKey: ['children-categories', page, size],
+        queryFn: () => getCategoriesChildren(page, size),
+        staleTime: 5 * 60 * 1000, // cache 5 phút
+    });
+}
+export const useCategoriesChildrenSelectAdmin = (page: number, size: number) => {
+    return useQuery({
+        queryKey: ['children-categories', page, size],
+        queryFn: () => getCategoriesChildrenSelectAdmin(page, size),
         staleTime: 5 * 60 * 1000, // cache 5 phút
     });
 }

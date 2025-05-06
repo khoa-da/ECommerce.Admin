@@ -13,3 +13,11 @@ export interface CreateCategoryPayload {
     parentId?: string; // optional nếu là parent category
     description?: string;
 }
+export interface UpdateCategoryPayload {
+    id: string;
+    name: string;
+    parentId?: string; // optional nếu là parent category
+    description?: string;
+}
+
+

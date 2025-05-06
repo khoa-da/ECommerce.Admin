@@ -32,7 +32,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useProductApi } from "@/hooks/product/mutation";
-import { useCategoriesChildren, useCategoriesParents } from "@/hooks/category/query";
+import { useCategoriesChildrenSelectAdmin } from "@/hooks/category/query";
 import { brandOptions, genderOptions, sizeOptions } from "@/constants/product-options";
 
 const productSchema = z.object({
@@ -52,7 +52,7 @@ const productSchema = z.object({
 export function DialogCreateProduct() {
     const queryClient = useQueryClient();
     const { productMutation } = useProductApi();
-    const { data: childrenCategoies } = useCategoriesChildren();
+    const { data: childrenCategoies } = useCategoriesChildrenSelectAdmin(1, 100);
 
     const [open, setOpen] = useState(false);
     const [files, setFiles] = useState<File[]>([]);

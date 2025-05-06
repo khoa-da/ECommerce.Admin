@@ -15,9 +15,11 @@ import { brandOptions, genderOptions, sizeOptions, statusOptions } from "@/const
 import { UpdateProductPayload } from "@/types/product";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
+import { useCategoriesChildrenSelectAdmin } from "@/hooks/category/query";
 
 const productSchema = z.object({
     name: z.string(),
+    categoryId: z.string(),
     description: z.string(),
     price: z.coerce.number().min(0),
     stock: z.coerce.number().min(0),
@@ -36,6 +38,7 @@ type ProductFormData = z.infer<typeof productSchema>;
 export default function ProductForm({ productId }: { productId: string }) {
     const queryClient = useQueryClient();
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
+    const { data: childrenCategoies } = useCategoriesChildrenSelectAdmin(1, 100);
 
     const { data: product, isLoading } = useQuery({
         queryKey: ["product-detail", productId],
@@ -57,6 +60,7 @@ export default function ProductForm({ productId }: { productId: string }) {
         resolver: zodResolver(productSchema),
         defaultValues: {
             name: "",
+            categoryId: "",
             description: "",
             price: 0,
             stock: 0,
@@ -66,7 +70,7 @@ export default function ProductForm({ productId }: { productId: string }) {
             material: "",
             gender: "",
             size: "",
-            status: "Active",
+            status: "",
             productImageBase64: [],
         },
     });
@@ -78,6 +82,7 @@ export default function ProductForm({ productId }: { productId: string }) {
                 brand: String(product.brand),
                 gender: String(product.gender),
                 size: String(product.size),
+                status: String(product.status),
                 productImageBase64: [],
             });
         }
@@ -115,7 +120,7 @@ export default function ProductForm({ productId }: { productId: string }) {
         const payload: UpdateProductPayload = {
             id: product.id,
             name: values.name,
-            categoryId: product.categoryId,
+            categoryId: String(values.categoryId) === "" ? "00000000-0000-0000-0000-000000000000" : String(values.categoryId),
             description: values.description,
             price: values.price,
             gender: String(values.gender),
@@ -125,8 +130,11 @@ export default function ProductForm({ productId }: { productId: string }) {
             sku: values.sku,
             tags: values.tags,
             material: values.material,
+            status: values.status,
             productImageBase64: values.productImageBase64 || [],
         };
+        console.log("Payload to update product:", payload);
+
 
         mutation.mutate(payload);
     };
@@ -211,6 +219,28 @@ export default function ProductForm({ productId }: { productId: string }) {
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
+                                        <FormField
+                                            control={form.control}
+                                            name="categoryId"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Category</FormLabel>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select Category" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {childrenCategoies?.items.map((cat) => (
+                                                                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
                                         <FormField name="description" control={form.control} render={({ field }) => (
                                             <FormItem>

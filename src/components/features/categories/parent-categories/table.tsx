@@ -1,3 +1,4 @@
+"use client";
 
 import * as React from "react";
 import {
@@ -12,7 +13,7 @@ import {
     useReactTable,
 } from "@tanstack/react-table";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -29,18 +30,45 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 import { useCategoriesParents } from "@/hooks/category/query";
-import { columns } from "@/components/features/categories/_components/columns";
+import { columns } from "@/components/features/categories/parent-categories/columns";
 import { DialogCreateParentCategory } from "./dialog-create-parent-category";
 
+
 export function ParentsCategoryTable() {
-    const { data, isLoading, error } = useCategoriesParents();
+    const [page, setPage] = React.useState(1);
+    const [pageSize, setPageSize] = React.useState(10);
+    const { data, isLoading, error, refetch } = useCategoriesParents(page, pageSize);
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+
+    // Sử dụng totalPages trực tiếp từ API response
+    const totalPages: number = data?.totalPages || 0;
+
+    // Handle page change
+    const goToPage = (newPage: number): void => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPage(newPage);
+        }
+    };
+
+    // Handle page size change
+    const handlePageSizeChange = (value: string): void => {
+        const newSize: number = parseInt(value);
+        setPageSize(newSize);
+        setPage(1); // Reset to first page when changing page size
+    };
 
     const table = useReactTable({
         data: data?.items ?? [], // nếu chưa có data thì [] cho an toàn
@@ -76,11 +104,19 @@ export function ParentsCategoryTable() {
                     className="max-w-sm"
                 />
                 <div className="flex items-center gap-3" >
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => refetch()}
+                        title="Refresh"
+                    >
+                        <RefreshCw className="h-4 w-4" />
+                    </Button>
                     <DialogCreateParentCategory />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className="ml-auto">
-                                Columns <ChevronDown />
+                                Columns <ChevronDown className="ml-1 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -99,8 +135,8 @@ export function ParentsCategoryTable() {
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-
             </div>
+
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
@@ -140,30 +176,76 @@ export function ParentsCategoryTable() {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
+
+            <div className="flex items-center justify-between py-4">
+                <div className="flex items-center space-x-2">
+                    <p className="text-sm text-muted-foreground">Rows per page</p>
+                    <Select
+                        value={pageSize.toString()}
+                        onValueChange={handlePageSizeChange}
+                    >
+                        <SelectTrigger className="h-8 w-16">
+                            <SelectValue placeholder={pageSize} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {[5, 10, 20, 50, 100].map((size) => (
+                                <SelectItem key={size} value={size.toString()}>
+                                    {size}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
-                <div className="space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        Next
-                    </Button>
+
+                <div className="flex items-center space-x-2">
+                    <div className="flex-1 text-sm text-muted-foreground">
+                        {data?.total ? (
+                            <>
+                                Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, data.total)} of {data.total} entries
+                            </>
+                        ) : (
+                            'No results'
+                        )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => goToPage(1)}
+                            disabled={page === 1}
+                        >
+                            First
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => goToPage(page - 1)}
+                            disabled={page === 1}
+                        >
+                            Previous
+                        </Button>
+                        <span className="text-sm">
+                            Page {data?.page || page} of {data?.totalPages || totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => goToPage(page + 1)}
+                            disabled={page >= totalPages}
+                        >
+                            Next
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => goToPage(totalPages)}
+                            disabled={page >= totalPages}
+                        >
+                            Last
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 }

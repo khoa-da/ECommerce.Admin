@@ -11,7 +11,11 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { DialogProductDetail } from '@/components/features/products/dialog-product-detail';
+
+import DeleteConfirmDialog from './dialog-delete-product';
+import { useDeleteProductApi } from '@/hooks/product/mutation';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const productColumns: ColumnDef<Product>[] = [
     {
@@ -81,12 +85,30 @@ export const productColumns: ColumnDef<Product>[] = [
         enableHiding: false,
         cell: ({ row }) => {
             const product = row.original;
+            const { deleteProductMutation } = useDeleteProductApi();
+            const queryClient = useQueryClient()
+
+
+            const handleDelete = () => {
+
+                deleteProductMutation.mutate(product.id, {
+                    onSuccess: () => {
+                        toast.success("Product deleted!");
+                        queryClient.invalidateQueries({ queryKey: ["products"] });
+
+                    },
+                    onError: () => {
+                        toast.error("Failed to delete product.");
+                    }
+                });
+            };
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                             <span className="sr-only">Open menu</span>
-                            <MoreHorizontal />
+                            <MoreHorizontal className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -97,13 +119,21 @@ export const productColumns: ColumnDef<Product>[] = [
                             Copy Product ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        {/* <DropdownMenuItem asChild>
-                            <DialogProductDetail productId={product.id} />
-                        </DropdownMenuItem> */}
                         <DropdownMenuItem
                             onClick={() => window.location.href = `/products/${product.id}`}
                         >
                             View / Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            <DeleteConfirmDialog
+                                trigger={
+                                    <button className="w-full text-left text-red-600">
+                                        Delete
+                                    </button>
+                                }
+                                onConfirm={handleDelete}
+                            // loading={isDeleting || deleteProductMutation.isPending}
+                            />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

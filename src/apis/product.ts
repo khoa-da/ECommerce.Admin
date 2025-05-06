@@ -4,7 +4,7 @@ import { CreateProductPayload, Product, ProductResponse, UpdateProductPayload } 
 
 
 export const getProducts = async (page: number, size: number): Promise<TPaginatedResponse<Product>> => {
-    const response = await httpClient.get<TPaginatedResponse<Product>>(`/products`, {
+    const response = await httpClient.get<TPaginatedResponse<Product>>(`/products/admin`, {
         params: {
             page,
             size
@@ -41,6 +41,9 @@ export const getProductById = async (id: string): Promise<ProductResponse> => {
     const response = await httpClient.get<ProductResponse>(`/products/${id}`);
     return response.data;
 }
+export const deleteProduct = async (id: string): Promise<void> => {
+    await httpClient.delete(`/products/${id}`);
+}
 export const updateProduct = async (payload: UpdateProductPayload): Promise<void> => {
     const formData = new FormData();
     formData.append("Name", payload.name);
@@ -55,6 +58,7 @@ export const updateProduct = async (payload: UpdateProductPayload): Promise<void
     formData.append("Tags", payload.tags);
     formData.append("Material", payload.material);
 
+    formData.append("Status", payload.status);
     payload.productImageBase64.forEach((imageBase64) => {
         formData.append("ProductImageBase64", imageBase64);
     });

@@ -69,5 +69,6 @@ export interface UpdateProductPayload {
     sku: string;
     tags: string;
     material: string;
+    status: string;
     productImageBase64: string[];
 }
