@@ -60,12 +60,9 @@ export const data = {
             items: [
                 {
                     title: "Orders",
-                    url: "#",
+                    url: "/orders",
                 },
-                {
-                    title: "Feedback",
-                    url: "#",
-                },
+
 
             ],
         }
